@@ -29,23 +29,35 @@ jobs:
     - name: Docker Login
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USER }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOdocker CKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
 
-    - name: Build Docker Image
+    - name: Build & Push Docker Image with Buildx
       env:
         NEW_VERSION: ${{ steps.version.outputs.version }}
       run: |
-        docker build -t nvbale/docker-graphql:$NEW_VERSION .
-        docker build -t nvbale/docker-graphql:latest .
+        docker buildx create --name mybuilder --driver docker-container --bootstrap
+        docker buildx use mybuilder
+        docker buildx build --platform linux/amd64,linux/arm64 -t nvbale/docker-graphql:$NEW_VERSION --push .
+        docker buildx build --platform linux/amd64,linux/arm64 -t nvbale/docker-graphql:latest --push .
 
-    - name: Push Docker Image
-      env:
-        NEW_VERSION: ${{ steps.version.outputs.version }}
-      run: |
-        docker push nvbale/docker-graphql:$NEW_VERSION
-        docker push nvbale/docker-graphql:latest
+
+
+
+    # - name: Build Docker Image
+    #   env:
+    #     NEW_VERSION: ${{ steps.version.outputs.version }}
+    #   run: |
+    #     docker build -t nvbale/docker-graphql:$NEW_VERSION .
+    #     docker build -t nvbale/docker-graphql:latest .
+
+    # - name: Push Docker Image
+    #   env:
+    #     NEW_VERSION: ${{ steps.version.outputs.version }}
+    #   run: |
+    #     docker push nvbale/docker-graphql:$NEW_VERSION
+    #     docker push nvbale/docker-graphql:latest
 
 
 
