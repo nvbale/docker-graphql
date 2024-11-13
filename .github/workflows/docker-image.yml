@@ -37,7 +37,7 @@ jobs:
       env:
         NEW_VERSION: ${{ steps.version.outputs.version }}
       run: |
-        docker buildx create --name mybuilder --driver docker-container --bootstrap
+        docker buildx create --use --name mybuilder --driver docker-container --bootstrap
         docker buildx build --platform linux/amd64,linux/arm64 -t nvbale/docker-graphql:$NEW_VERSION --push .
         docker buildx build --platform linux/amd64,linux/arm64 -t nvbale/docker-graphql:latest --push .
 
